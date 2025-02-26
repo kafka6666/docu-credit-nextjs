@@ -1,7 +1,7 @@
 // app/api/generate-draft/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { processDocumentaryCredit } from '@/utils/googleService';
-import { generateDocumentaryCredit } from '@/utils/textFromPDF';
+import { generateDocumentaryCredit } from '@/utils/pdfProcessor';
 
 interface RequestBody {
   extractedText: string;
@@ -18,22 +18,22 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Process with Claude API
+    // Process with Gemini API
     const { structuredData, swiftMT700 } = await processDocumentaryCredit(extractedText);
     
     // Generate PDF bytes
     const pdfBytes = await generateDocumentaryCredit(structuredData, swiftMT700);
     
-    // Return structured data, SWIFT MT 700, and PDF bytes as base64
+    // Return structured data, SWIFT MT 700, and PDF bytes as base64 (can't understand this portion)
     return NextResponse.json({
       structuredData,
       swiftMT700,
       pdfBase64: Buffer.from(pdfBytes).toString('base64')
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error generating documentary credit draft:', error);
     return NextResponse.json(
-      { message: 'Failed to generate documentary credit draft', error: error.message },
+      { message: 'Failed to generate documentary credit draft', error },
       { status: 500 }
     );
   }
